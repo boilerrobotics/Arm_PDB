@@ -1,4 +1,6 @@
 #include "matrix_algebra.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 //define a struct to represent an n by m matrix. 
 // the entries of this matrix should be doubles.
@@ -9,6 +11,7 @@ struct matrix
 	double **data;
 };
 
+typedef struct matrix mat;
 
 mat* create_matrix(int n, int m)
 {
@@ -29,9 +32,10 @@ mat* create_matrix(int n, int m)
 		if (!output->data[i]){
 			for(int k=0; k < i; k++){
 				free(output->data[k]);
-				return NULL;
 			}
+			free(output->data);
 			free(output);
+			return NULL;
 		}
 	}
 
@@ -117,9 +121,8 @@ mat* matrix_add(mat* A, mat* B)
 		return NULL;
 	}
 
-	mat *C = create_matrix(A->rows, A->cols);
+	mat *C = create_matrix(A->cols, A->rows);
 	if (!C){
-		free (C);
 		return NULL;
 	}
 
@@ -134,11 +137,15 @@ mat* matrix_add(mat* A, mat* B)
 
 void matrix_free(mat* A)
 {
+	if (!A) return;
 	//fill in this funciton to free the matrix A.
-	for (int i=0; i < A->cols; i++){
-		free(A->data[i]);
+	if (A->data){
+		for (int i=0; i < A->cols; i++){
+			free(A->data[i]);
+		}
+		free(A->data);
 	}
-	free (A);
+	free(A);
 }
 
 int matrix_write(char* filename, mat* A)
